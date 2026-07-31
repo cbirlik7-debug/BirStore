@@ -2,43 +2,86 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
 .app-header {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 12px 20px;
+  gap: 32px;
+  padding: 0 20px;
+  height: 52px;
   border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.app-header h1 {
+  font-size: 15px;
+  white-space: nowrap;
 }
 
 .app-nav {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 4px;
   flex: 1;
+}
+
+.app-nav a {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.app-nav a:hover {
+  color: var(--text-h);
+  background: var(--bg);
+}
+
+.app-nav a.active {
+  color: var(--text-h);
+  background: var(--accent-bg);
+}
+
+.app-nav button {
+  margin-left: auto;
+  padding: 6px 12px;
+  font-size: 13px;
 }
 
 .app-shell main {
   flex: 1;
-  padding: 20px;
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px;
 }
 
 .active-shelf-banner {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  margin: 12px 0;
+  padding: 12px 16px;
+  margin: 16px 0;
   background: var(--accent-bg);
-  border-radius: 6px;
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  color: var(--text-h);
+}
+
+.active-shelf-banner button {
+  margin-left: auto;
 }
 
 .pending-list,
 .results-table table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 12px;
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .pending-list th,
@@ -46,18 +89,96 @@
 .results-table th,
 .results-table td {
   border-bottom: 1px solid var(--border);
-  padding: 8px;
+  padding: 10px 12px;
   text-align: left;
+  font-size: 14px;
+}
+
+.pending-list th,
+.results-table th {
+  background: var(--bg-surface);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pending-list tr:last-child td,
+.results-table tr:last-child td {
+  border-bottom: none;
+}
+
+.pending-list input[type='number'] {
+  width: 64px;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   max-width: 320px;
-  margin: 60px auto;
+  margin: 80px auto;
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.login-form h2 {
+  text-align: center;
 }
 
 .results-table .total {
   font-weight: 600;
+  color: var(--text-h);
+  margin-top: 12px;
+}
+
+.shelf-scan-step,
+.product-scan-step {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.shelf-scan-step input,
+.product-scan-step input,
+.search-bar input {
+  width: 100%;
+  max-width: 320px;
+}
+
+.search-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-bar form {
+  display: flex;
+  gap: 8px;
+}
+
+.commit-button {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.product-picker {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-picker button {
+  width: 100%;
+  text-align: left;
 }

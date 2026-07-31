@@ -14,7 +14,7 @@ interface UseSmartBarcodeInputOptions {
  */
 export function useSmartBarcodeInput({
   onScan,
-  silenceMs = 454,
+  silenceMs = 3000,
   minLengthForEarlyEnter = 6,
 }: UseSmartBarcodeInputOptions) {
   const [value, setValue] = useState('');
