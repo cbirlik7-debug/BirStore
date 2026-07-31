@@ -1,0 +1,2 @@
+import './shelving';
+import './productLocator';
