@@ -1,5 +1,7 @@
 import type { Role } from '../permissions/types';
 
+export type RequiredId = 'IMEI1' | 'IMEI2' | 'SERIAL';
+
 export interface Database {
   public: {
     Tables: {
@@ -10,9 +12,38 @@ export interface Database {
         Relationships: [];
       };
       products: {
-        Row: { id: string; ean: string; article_no: string; name: string; created_at: string };
-        Insert: { ean: string; article_no: string; name: string };
-        Update: { ean?: string; article_no?: string; name?: string };
+        Row: {
+          id: string;
+          ean: string;
+          article_no: string;
+          name: string;
+          required_ids: RequiredId[];
+          created_at: string;
+        };
+        Insert: {
+          ean: string;
+          article_no: string;
+          name: string;
+          required_ids?: RequiredId[];
+        };
+        Update: {
+          ean?: string;
+          article_no?: string;
+          name?: string;
+          required_ids?: RequiredId[];
+        };
+        Relationships: [];
+      };
+      magazalar: {
+        Row: { kod: string; ad: string };
+        Insert: { kod: string; ad: string };
+        Update: { ad?: string };
+        Relationships: [];
+      };
+      tedarikciler: {
+        Row: { id: string; ad: string };
+        Insert: { ad: string };
+        Update: { ad?: string };
         Relationships: [];
       };
       shelves: {
