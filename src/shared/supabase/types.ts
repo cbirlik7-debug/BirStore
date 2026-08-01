@@ -46,6 +46,85 @@ export interface Database {
         Update: { ad?: string };
         Relationships: [];
       };
+      siparisler: {
+        Row: {
+          id: string;
+          siparis_no: string;
+          tedarikci_id: string | null;
+          irsaliye_no: string | null;
+          created_at: string;
+        };
+        Insert: { siparis_no: string; tedarikci_id?: string | null; irsaliye_no?: string | null };
+        Update: { siparis_no?: string; tedarikci_id?: string | null; irsaliye_no?: string | null };
+        Relationships: [
+          {
+            foreignKeyName: 'siparisler_tedarikci_id_fkey';
+            columns: ['tedarikci_id'];
+            isOneToOne: false;
+            referencedRelation: 'tedarikciler';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      siparis_kalemleri: {
+        Row: { id: string; siparis_id: string; product_id: string; beklenen: number };
+        Insert: { siparis_id: string; product_id: string; beklenen: number };
+        Update: { beklenen?: number };
+        Relationships: [
+          {
+            foreignKeyName: 'siparis_kalemleri_siparis_id_fkey';
+            columns: ['siparis_id'];
+            isOneToOne: false;
+            referencedRelation: 'siparisler';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'siparis_kalemleri_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      koli_tanimlari: {
+        Row: {
+          barkod: string;
+          tip: string;
+          siparis_id: string | null;
+          magaza_kodu: string | null;
+          uyari: string | null;
+        };
+        Insert: {
+          barkod: string;
+          tip: string;
+          siparis_id?: string | null;
+          magaza_kodu?: string | null;
+          uyari?: string | null;
+        };
+        Update: {
+          tip?: string;
+          siparis_id?: string | null;
+          magaza_kodu?: string | null;
+          uyari?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'koli_tanimlari_siparis_id_fkey';
+            columns: ['siparis_id'];
+            isOneToOne: false;
+            referencedRelation: 'siparisler';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'koli_tanimlari_magaza_kodu_fkey';
+            columns: ['magaza_kodu'];
+            isOneToOne: false;
+            referencedRelation: 'magazalar';
+            referencedColumns: ['kod'];
+          },
+        ];
+      };
       shelves: {
         Row: {
           id: string;

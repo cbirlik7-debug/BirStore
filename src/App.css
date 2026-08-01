@@ -328,3 +328,99 @@
   width: 100%;
   text-align: left;
 }
+
+.orders-form {
+  align-items: flex-start;
+}
+
+.order-items-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.order-item-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.order-item-row select {
+  flex: 1;
+}
+
+.order-items-detail {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.order-progress-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.order-progress-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.order-progress-card-header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-h);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.progress-label {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.order-item-progress-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-item-progress-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+}
+
+.order-item-progress-list li.complete {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
