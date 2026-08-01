@@ -400,6 +400,24 @@ Sahadan gelen gerçek örnekler, sınıflandırma/parsing mantığı için:
   sayımın aynı anda (farklı kullanıcılar/cihazlar tarafından) yapılabilmesi**
   gerekiyor (eşzamanlılık/çakışma yönetimi düşünülmeli)
 
+## 8.1 Netleştirmeler (2026-08-01, kullanıcıyla görüşülerek karara bağlandı)
+
+- **Cihaz ≠ yetki sınırı:** Günlük işleyiş notlarında "iade/transfer MDE ile,
+  depolar arası transfer bilgisayarla" gibi cihaza bağlı ayrımlar geçiyor —
+  bu YANLIŞ yönlendirme, kullanıcı bundan kurtulmak istiyor. **Tüm işlemler
+  hem PC hem telefondan yapılabilmeli** (örn. telefondan EAN okutup ilgili
+  sipariş no ile eşleştirip çıkış yapılabilmeli). Erişim sadece **rol**
+  bazlı olmalı (`depocu`/`satis`/`yonetici`), cihaz bazlı değil — mevcut
+  `moduleRegistry` mimarisi zaten bunu destekliyor, ekstra iş gerekmiyor.
+- **İrsaliye AI/OCR okuma:** Tekrar soruldu, yine **ertelendi** (§7'deki
+  karar geçerliliğini koruyor).
+- **Evrak saklama** (irsaliye dosyası vb. sisteme yüklenip saklanması) ve
+  **eksik irsaliye takibi** (ayrı bir "irsaliye bekleniyor" durumu/ekranı):
+  ikisi de şimdilik **kapsam dışı bırakıldı**, ileride ayrıca ele alınacak.
+- **Depo kodları arası transfer/iade modülü** (5/6/9/11/30/99, §1, §7) artık
+  aktif olarak isteniyor — günlük işleyişin bir parçası olarak belirtildi,
+  "henüz yok" notu geçerliliğini yitirdi, yapılacaklar listesine girmeli.
+
 ---
 
 ## 9. Modüler Mimariye Geçiş İçin Öneriler
