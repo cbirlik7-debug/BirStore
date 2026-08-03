@@ -1,4 +1,5 @@
 import './dashboard';
+import './goodsReceiving';
 import './shelving';
 import './productLocator';
 import './catalog';

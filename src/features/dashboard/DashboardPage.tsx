@@ -49,6 +49,18 @@ export function DashboardPage() {
                 <strong>{stats.tedarikciSayisi}</strong>
                 <span>Tedarikçi</span>
               </div>
+              <div className="stat-tile">
+                <strong>{stats.okutulanKoli}</strong>
+                <span>Okutulan Koli</span>
+              </div>
+              <div className="stat-tile">
+                <strong>{stats.acikKoli}</strong>
+                <span>Açık Koli</span>
+              </div>
+              <div className="stat-tile">
+                <strong>{stats.okutulanUrun}</strong>
+                <span>Okutulan Ürün</span>
+              </div>
             </div>
 
             <h3>Son Eklenen Siparişler</h3>

@@ -1,6 +1,7 @@
 import type { Role } from '../permissions/types';
 
 export type RequiredId = 'IMEI1' | 'IMEI2' | 'SERIAL';
+export type IdentifierValues = Partial<Record<RequiredId, string>>;
 
 export interface Database {
   public: {
@@ -122,6 +123,85 @@ export interface Database {
             isOneToOne: false;
             referencedRelation: 'magazalar';
             referencedColumns: ['kod'];
+          },
+        ];
+      };
+      koliler: {
+        Row: {
+          id: string;
+          barkod: string;
+          tip: string;
+          siparis_id: string | null;
+          magaza_kodu: string | null;
+          durum: string;
+          uyari: string | null;
+          reopen_log: { at: string }[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          barkod: string;
+          tip: string;
+          siparis_id?: string | null;
+          magaza_kodu?: string | null;
+          durum?: string;
+          uyari?: string | null;
+          reopen_log?: { at: string }[];
+        };
+        Update: {
+          durum?: string;
+          reopen_log?: { at: string }[];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'koliler_siparis_id_fkey';
+            columns: ['siparis_id'];
+            isOneToOne: false;
+            referencedRelation: 'siparisler';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'koliler_magaza_kodu_fkey';
+            columns: ['magaza_kodu'];
+            isOneToOne: false;
+            referencedRelation: 'magazalar';
+            referencedColumns: ['kod'];
+          },
+        ];
+      };
+      koli_urunler: {
+        Row: {
+          id: string;
+          koli_id: string;
+          product_id: string | null;
+          raw_barkod: string | null;
+          identifiers: IdentifierValues;
+          beklenmeyen: boolean;
+          created_at: string;
+        };
+        Insert: {
+          koli_id: string;
+          product_id?: string | null;
+          raw_barkod?: string | null;
+          identifiers?: IdentifierValues;
+          beklenmeyen?: boolean;
+        };
+        Update: Record<string, never>;
+        Relationships: [
+          {
+            foreignKeyName: 'koli_urunler_koli_id_fkey';
+            columns: ['koli_id'];
+            isOneToOne: false;
+            referencedRelation: 'koliler';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'koli_urunler_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
           },
         ];
       };
