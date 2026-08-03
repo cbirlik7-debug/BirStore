@@ -130,7 +130,7 @@ export function CatalogPage() {
                       ))}
                 </td>
                 <td>
-                  <button type="button" onClick={() => handleDelete(p.id)}>
+                  <button type="button" className="btn-danger" onClick={() => handleDelete(p.id)}>
                     Sil
                   </button>
                 </td>

@@ -66,7 +66,7 @@ function StoresSection() {
             <span>
               {s.kod} — {s.ad}
             </span>
-            <button type="button" onClick={() => handleDelete(s.kod)}>
+            <button type="button" className="btn-danger" onClick={() => handleDelete(s.kod)}>
               Sil
             </button>
           </li>
@@ -127,7 +127,7 @@ function SuppliersSection() {
         {suppliers.map((s) => (
           <li key={s.id}>
             <span>{s.ad}</span>
-            <button type="button" onClick={() => handleDelete(s.id)}>
+            <button type="button" className="btn-danger" onClick={() => handleDelete(s.id)}>
               Sil
             </button>
           </li>

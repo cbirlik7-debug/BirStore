@@ -5,6 +5,7 @@ export interface ModuleDefinition {
   id: string;
   label: string;
   path: string;
+  icon?: string;
   allowedRoles: Role[];
   element: ComponentType;
   order?: number;

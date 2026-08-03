@@ -1,3 +1,4 @@
+import './dashboard';
 import './shelving';
 import './productLocator';
 import './catalog';

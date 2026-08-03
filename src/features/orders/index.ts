@@ -5,6 +5,7 @@ registerModule({
   id: 'orders',
   label: 'Siparişler',
   path: '/siparisler',
+  icon: '📋',
   allowedRoles: ['yonetici'],
   element: OrdersPage,
   order: 50,

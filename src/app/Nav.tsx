@@ -3,19 +3,21 @@ import { useAuth } from '../shared/auth/useAuth';
 import { getModulesForRole } from '../shared/permissions/moduleRegistry';
 
 export function Nav() {
-  const { role, signOut } = useAuth();
+  const { role } = useAuth();
   const modules = getModulesForRole(role);
 
   return (
-    <nav className="app-nav">
+    <nav className="sidebar-nav">
       {modules.map((m) => (
-        <NavLink key={m.id} to={m.path}>
-          {m.label}
+        <NavLink
+          key={m.id}
+          to={m.path}
+          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+        >
+          <span className="nav-icon">{m.icon}</span>
+          <span>{m.label}</span>
         </NavLink>
       ))}
-      <button type="button" onClick={() => signOut()}>
-        Çıkış
-      </button>
     </nav>
   );
 }

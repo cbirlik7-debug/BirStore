@@ -142,12 +142,16 @@ export function BoxDefinitionsPage() {
             {definitions.map((d) => (
               <tr key={d.barkod}>
                 <td>{d.barkod}</td>
-                <td>{d.tip === 'eirsaliye' ? 'e-İrsaliye' : 'Kurye'}</td>
+                <td>
+                  <span className={`badge ${d.tip === 'eirsaliye' ? 'badge-blue' : 'badge-gray'}`}>
+                    {d.tip === 'eirsaliye' ? 'e-İrsaliye' : 'Kurye'}
+                  </span>
+                </td>
                 <td>{d.siparisNo ?? '—'}</td>
                 <td>{d.magazaKodu ?? '—'}</td>
                 <td>{d.uyari ?? '—'}</td>
                 <td>
-                  <button type="button" onClick={() => handleDelete(d.barkod)}>
+                  <button type="button" className="btn-danger" onClick={() => handleDelete(d.barkod)}>
                     Sil
                   </button>
                 </td>

@@ -183,7 +183,7 @@ export function OrdersPage() {
                     </button>
                   </td>
                   <td>
-                    <button type="button" onClick={() => handleDelete(order.id)}>
+                    <button type="button" className="btn-danger" onClick={() => handleDelete(order.id)}>
                       Sil
                     </button>
                   </td>

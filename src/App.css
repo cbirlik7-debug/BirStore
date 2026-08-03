@@ -1,61 +1,152 @@
 .app-shell {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   background: var(--bg);
 }
 
-.app-header {
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
   display: flex;
-  align-items: center;
-  gap: 32px;
-  padding: 0 20px;
-  height: 52px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-surface);
+  flex-direction: column;
+  padding: 20px 16px;
+  gap: 24px;
 }
 
-.app-header h1 {
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.brand-title {
+  color: var(--text-h);
+  font-weight: 600;
   font-size: 15px;
-  white-space: nowrap;
 }
 
-.app-nav {
+.brand-subtitle {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.sidebar-nav {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
 }
 
-.app-nav a {
-  padding: 6px 12px;
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
   border-radius: 6px;
   font-size: 14px;
   color: var(--text);
 }
 
-.app-nav a:hover {
+.nav-link:hover {
   color: var(--text-h);
-  background: var(--bg);
+  background: var(--bg-surface);
 }
 
-.app-nav a.active {
+.nav-link.active {
   color: var(--text-h);
   background: var(--accent-bg);
 }
 
-.app-nav button {
-  margin-left: auto;
-  padding: 6px 12px;
-  font-size: 13px;
+.nav-icon {
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-.app-shell main {
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.db-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--badge-green-bg);
+  color: var(--badge-green-fg);
+  font-size: 12px;
+  border: 1px solid var(--accent-border);
+}
+
+.app-main {
   flex: 1;
-  max-width: 880px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 32px 20px;
+  min-width: 0;
+  padding: 32px 40px;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px;
+    gap: 12px;
+    overflow-x: auto;
+  }
+
+  .sidebar-brand {
+    flex-shrink: 0;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    flex: none;
+  }
+
+  .nav-link span:last-child {
+    display: none;
+  }
+
+  .sidebar-footer {
+    flex-direction: row;
+    border-top: none;
+    border-left: 1px solid var(--border);
+    padding-top: 0;
+    padding-left: 12px;
+    margin-left: auto;
+  }
+
+  .db-status {
+    display: none;
+  }
+
+  .app-main {
+    padding: 20px;
+  }
 }
 
 .active-shelf-banner {
@@ -259,6 +350,32 @@
   margin-right: 4px;
 }
 
+.badge-blue {
+  background: var(--badge-blue-bg);
+  color: var(--badge-blue-fg);
+}
+
+.badge-gray {
+  background: var(--badge-gray-bg);
+  color: var(--badge-gray-fg);
+}
+
+.badge-green {
+  background: var(--badge-green-bg);
+  color: var(--badge-green-fg);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c33338;
+  border-color: #c33338;
+}
+
 .definitions-page section {
   margin-bottom: 32px;
 }
@@ -423,4 +540,34 @@
 .order-item-progress-list li.complete {
   border-color: var(--accent-border);
   background: var(--accent-bg);
+}
+
+.dashboard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0 32px;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+.stat-tile strong {
+  font-size: 24px;
+  color: var(--text-h);
+}
+
+.stat-tile span {
+  font-size: 12px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }

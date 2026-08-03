@@ -5,6 +5,7 @@ registerModule({
   id: 'catalog',
   label: 'Ürün Kataloğu',
   path: '/katalog',
+  icon: '🏷️',
   allowedRoles: ['yonetici'],
   element: CatalogPage,
   order: 30,
