@@ -21,7 +21,6 @@ export const ScannerInput = forwardRef<HTMLInputElement, ScannerInputProps>(
         <input
           ref={ref}
           type="text"
-          inputMode="none"
           value={value}
           onChange={onChange}
           onKeyDown={onKeyDown}
