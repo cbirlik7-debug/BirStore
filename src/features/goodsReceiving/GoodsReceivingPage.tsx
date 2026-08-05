@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { BoxScanStep } from './components/BoxScanStep';
 import { ActiveBoxBanner } from './components/ActiveBoxBanner';
-import { ProductEntryStep } from './components/ProductEntryStep';
-import { IdentifierSlots } from './components/IdentifierSlots';
+import { CaptureFieldsPanel } from './components/CaptureFieldsPanel';
 import { UnitList } from './components/UnitList';
 import { ClosedBoxList } from './components/ClosedBoxList';
-import { useStickyProductEntry } from './hooks/useStickyProductEntry';
+import { ScannerInput } from '../../shared/scanner/ScannerInput';
+import { useProductCapture } from './hooks/useProductCapture';
 import { closeBox, reopenBox } from './api/goodsReceiving.api';
 import type { ActiveBox } from './types';
+
+const FullScreenProductScanner = lazy(() =>
+  import('./components/FullScreenProductScanner').then((m) => ({
+    default: m.FullScreenProductScanner,
+  })),
+);
 
 function ActiveBoxWorkspace({
   box,
@@ -18,8 +24,9 @@ function ActiveBoxWorkspace({
   onClosed: (box: ActiveBox) => void;
   onChangeBox: () => void;
 }) {
-  const entry = useStickyProductEntry(box.id);
+  const capture = useProductCapture(box);
   const [closing, setClosing] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(true);
 
   async function handleClose() {
     setClosing(true);
@@ -31,28 +38,49 @@ function ActiveBoxWorkspace({
     }
   }
 
+  if (cameraOpen) {
+    return (
+      <Suspense fallback={<div className="fullscreen-scanner-loading">Kamera açılıyor...</div>}>
+        <FullScreenProductScanner
+          box={box}
+          capture={capture.capture}
+          currentProductProgress={capture.currentProductProgress}
+          orderProgress={capture.orderProgress}
+          canAccept={capture.canAccept}
+          onScan={capture.handleScan}
+          onTargetField={capture.setTargetField}
+          onAccept={capture.handleAccept}
+          onDiscard={capture.handleDiscard}
+          onClose={() => setCameraOpen(false)}
+        />
+      </Suspense>
+    );
+  }
+
   return (
     <div className="active-box-workspace">
       <ActiveBoxBanner box={box} onClose={handleClose} onChangeBox={onChangeBox} closing={closing} />
 
-      {entry.error && <p role="alert">{entry.error}</p>}
+      {capture.error && <p role="alert">{capture.error}</p>}
 
-      {!entry.activeProduct ? (
-        <ProductEntryStep onScan={entry.handleScan} />
-      ) : (
-        <IdentifierSlots
-          product={entry.activeProduct}
-          filled={entry.filled}
-          mode={entry.mode}
-          onModeChange={entry.setMode}
-          targetField={entry.targetField}
-          onTargetField={entry.setTargetField}
-          onScan={entry.handleScan}
-          onCancel={entry.cancelActiveProduct}
-        />
-      )}
+      <ScannerInput onScan={capture.handleScan} placeholder="EAN / IMEI / Seri okutun" />
+      <button type="button" onClick={() => setCameraOpen(true)}>
+        Tam Ekran Kamera
+      </button>
 
-      <UnitList units={entry.units} onRemove={entry.removeUnit} />
+      <CaptureFieldsPanel
+        box={box}
+        capture={capture.capture}
+        currentProductProgress={capture.currentProductProgress}
+        orderProgress={capture.orderProgress}
+        onTargetField={capture.setTargetField}
+        onAccept={capture.handleAccept}
+        onDiscard={capture.handleDiscard}
+        canAccept={capture.canAccept}
+        variant="inline"
+      />
+
+      <UnitList units={capture.units} onRemove={capture.removeUnit} />
     </div>
   );
 }

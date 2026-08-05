@@ -30,4 +30,15 @@ export interface EntryProduct {
   requiredIds: RequiredId[];
 }
 
-export type ScanMode = 'sirali' | 'birlesik';
+export interface CaptureState {
+  ean: string;
+  product: EntryProduct | null;
+  isUnexpected: boolean;
+  identifiers: IdentifierValues;
+  targetField: RequiredId | null;
+}
+
+export interface ProductProgress {
+  girilen: number;
+  beklenen: number;
+}

@@ -25,7 +25,7 @@ export function useCameraScanner(videoRef: RefObject<HTMLVideoElement | null>) {
   }, []);
 
   const start = useCallback(
-    async (onDetected: (value: string) => void) => {
+    async (onDetected: (value: string) => void, opts?: { continuous?: boolean }) => {
       setError(null);
       if (!videoRef.current) return;
 
@@ -38,7 +38,7 @@ export function useCameraScanner(videoRef: RefObject<HTMLVideoElement | null>) {
           (result) => {
             if (result) {
               onDetected(result.getText());
-              stop();
+              if (!opts?.continuous) stop();
             }
             // Sürekli tarama modunda "bulunamadı" hataları normaldir (her
             // karede barkod olmayabilir) — sadece başarılı sonuç işlenir.
