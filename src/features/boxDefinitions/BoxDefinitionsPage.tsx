@@ -127,6 +127,7 @@ export function BoxDefinitionsPage() {
       {loading ? (
         <p>Yükleniyor...</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -159,6 +160,7 @@ export function BoxDefinitionsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

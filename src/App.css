@@ -330,13 +330,17 @@
   font-size: 13px;
 }
 
-.catalog-table {
+.table-scroll {
   width: 100%;
-  border-collapse: collapse;
+  overflow-x: auto;
   margin-top: 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow: hidden;
+}
+
+.catalog-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .catalog-table th,
@@ -451,6 +455,7 @@
   display: flex;
   gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .duplicate-groups {
@@ -485,6 +490,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
   font-size: 13px;
 }
 
@@ -532,6 +538,7 @@
 .sayim-item-list li {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 8px 10px;
   border: 1px solid var(--border);

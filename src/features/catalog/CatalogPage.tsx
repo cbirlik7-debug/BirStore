@@ -104,6 +104,7 @@ export function CatalogPage() {
       {loading ? (
         <p>Yükleniyor...</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -138,6 +139,7 @@ export function CatalogPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

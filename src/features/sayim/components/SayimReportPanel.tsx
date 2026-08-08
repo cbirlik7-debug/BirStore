@@ -22,6 +22,7 @@ export function SayimReportPanel({ sayim }: { sayim: Sayim }) {
       {rows.length === 0 ? (
         <p>Bu sayımda henüz sayılan raf yok.</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -46,6 +47,7 @@ export function SayimReportPanel({ sayim }: { sayim: Sayim }) {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

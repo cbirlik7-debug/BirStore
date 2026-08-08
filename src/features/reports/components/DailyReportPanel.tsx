@@ -82,6 +82,7 @@ export function DailyReportPanel() {
           {report.urunDokum.length === 0 ? (
             <p>Bu tarihte ürün girişi yok.</p>
           ) : (
+            <div className="table-scroll">
             <table className="catalog-table">
               <thead>
                 <tr>
@@ -100,6 +101,7 @@ export function DailyReportPanel() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </>
       )}

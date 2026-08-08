@@ -91,6 +91,7 @@ export function SayimPage() {
       ) : sayimlar.length === 0 ? (
         <p>Henüz sayım yok.</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -129,6 +130,7 @@ export function SayimPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

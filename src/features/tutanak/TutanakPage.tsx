@@ -256,6 +256,7 @@ export function TutanakPage() {
       ) : tutanaklar.length === 0 ? (
         <p>Henüz tutanak yok.</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -312,6 +313,7 @@ export function TutanakPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

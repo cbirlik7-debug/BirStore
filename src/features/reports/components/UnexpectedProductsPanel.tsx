@@ -50,6 +50,7 @@ export function UnexpectedProductsPanel() {
       {items.length === 0 ? (
         <p>Beklenmeyen ürün yok.</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -95,6 +96,7 @@ export function UnexpectedProductsPanel() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

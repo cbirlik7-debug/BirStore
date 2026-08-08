@@ -157,6 +157,7 @@ export function OrdersPage() {
       {loading ? (
         <p>Yükleniyor...</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -205,6 +206,7 @@ export function OrdersPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

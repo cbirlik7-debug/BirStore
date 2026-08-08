@@ -94,6 +94,7 @@ export function UserManagementPage() {
       {loading ? (
         <p>Yükleniyor...</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -124,6 +125,7 @@ export function UserManagementPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

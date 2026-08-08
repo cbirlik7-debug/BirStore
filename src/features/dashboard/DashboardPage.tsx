@@ -74,6 +74,7 @@ export function DashboardPage() {
             {recentOrders.length === 0 ? (
               <p>Henüz sipariş yok.</p>
             ) : (
+              <div className="table-scroll">
               <table className="catalog-table">
                 <thead>
                   <tr>
@@ -94,6 +95,7 @@ export function DashboardPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </>
         )

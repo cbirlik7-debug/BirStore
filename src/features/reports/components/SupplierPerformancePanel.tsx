@@ -28,6 +28,7 @@ export function SupplierPerformancePanel() {
       {items.length === 0 ? (
         <p>Henüz veri yok.</p>
       ) : (
+        <div className="table-scroll">
         <table className="catalog-table">
           <thead>
             <tr>
@@ -52,6 +53,7 @@ export function SupplierPerformancePanel() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );
