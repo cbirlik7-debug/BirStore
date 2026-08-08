@@ -90,7 +90,9 @@ a {
   text-decoration: none;
 }
 
-button {
+button,
+a[role='button'] {
+  display: inline-block;
   font: inherit;
   cursor: pointer;
   border-radius: 6px;
@@ -102,7 +104,8 @@ button {
     background 0.15s,
     border-color 0.15s;
 }
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+a[role='button']:hover {
   border-color: var(--accent-border);
 }
 button:disabled {

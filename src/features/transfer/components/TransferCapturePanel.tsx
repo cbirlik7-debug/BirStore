@@ -1,5 +1,5 @@
 import type { RequiredId } from '../../../shared/supabase/types';
-import type { ActiveBox, CaptureState, ProductProgress } from '../types';
+import type { TransferCaptureState, TransferSiparis } from '../types';
 
 const LABELS: Record<RequiredId, string> = {
   IMEI1: 'IMEI 1',
@@ -7,21 +7,19 @@ const LABELS: Record<RequiredId, string> = {
   SERIAL: 'Seri No',
 };
 
-export function CaptureFieldsPanel({
-  box,
+export function TransferCapturePanel({
+  transfer,
   capture,
-  currentProductProgress,
-  orderProgress,
+  unitCount,
   onTargetField,
   onAccept,
   onDiscard,
   canAccept,
   variant = 'inline',
 }: {
-  box: ActiveBox;
-  capture: CaptureState | null;
-  currentProductProgress: ProductProgress | null;
-  orderProgress: ProductProgress | null;
+  transfer: TransferSiparis;
+  capture: TransferCaptureState | null;
+  unitCount: number;
   onTargetField: (field: RequiredId) => void;
   onAccept: () => void;
   onDiscard: () => void;
@@ -31,24 +29,15 @@ export function CaptureFieldsPanel({
   return (
     <div className={`capture-panel capture-panel-${variant}`}>
       <div className="capture-panel-context">
-        <span>{box.barkod}</span>
-        {box.siparisNo && <span>Sipariş: {box.siparisNo}</span>}
+        <span>{transfer.transferNo}</span>
+        <span>
+          {transfer.kaynakDepoKodu} → {transfer.hedefDepoKodu}
+        </span>
       </div>
 
-      {(orderProgress || currentProductProgress) && (
-        <div className="capture-panel-progress">
-          {currentProductProgress && (
-            <span>
-              Bu üründe: {currentProductProgress.girilen}/{currentProductProgress.beklenen}
-            </span>
-          )}
-          {orderProgress && (
-            <span>
-              Sipariş toplam: {orderProgress.girilen}/{orderProgress.beklenen}
-            </span>
-          )}
-        </div>
-      )}
+      <div className="capture-panel-progress">
+        <span>Bu {transfer.tip === 'iade' ? 'iadede' : 'transferde'}: {unitCount} ürün</span>
+      </div>
 
       {!capture ? (
         <p className="capture-panel-hint">EAN okutun.</p>
@@ -95,8 +84,7 @@ export function CaptureFieldsPanel({
             <p className="capture-panel-duplicate-warning" role="alert">
               Bu IMEI/Seri daha önce {capture.duplicateWarning.koliBarkod} kolisinde
               {capture.duplicateWarning.siparisNo ? ` (Sipariş: ${capture.duplicateWarning.siparisNo})` : ''}{' '}
-              okutulmuş — kayıt engellendi. Yanlış okutulduysa Vazgeç ile temizleyip kontrol edin, gerekirse
-              Raporlar → Mükerrer Kayıtlar'dan eski kaydı düzeltin.
+              okutulmuş — kayıt engellendi.
             </p>
           )}
 

@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { listOrdersWithProgress, getOrderItemProgress } from './api/orderTracking.api';
+import { useRealtimeRefresh } from '../../shared/realtime/useRealtimeRefresh';
 import type { OrderProgress, OrderItemProgress } from './types';
 
 export function OrderTrackingPage() {
@@ -9,12 +11,18 @@ export function OrderTrackingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     listOrdersWithProgress()
       .then(setOrders)
       .catch((e) => setError(e instanceof Error ? e.message : 'Siparişler yüklenemedi'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  useRealtimeRefresh(['koliler', 'koli_urunler', 'siparisler'], refresh);
 
   async function openOrder(order: OrderProgress) {
     setSelected(order);
@@ -35,6 +43,9 @@ export function OrderTrackingPage() {
         <h2>
           {selected.siparisNo} {selected.tedarikciAdi ? `— ${selected.tedarikciAdi}` : ''}
         </h2>
+        <Link to={`/tutanaklar?siparisId=${selected.id}`} className="btn-accept" role="button">
+          Tutanak Hazırla
+        </Link>
         {error && <p role="alert">{error}</p>}
         <ul className="order-item-progress-list">
           {items.map((item) => (

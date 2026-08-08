@@ -1,6 +1,7 @@
 import { supabase } from '../../../shared/supabase/client';
+import { runOrQueue, registerOfflineHandler } from '../../../shared/offline/offlineQueue';
 import type { IdentifierValues, RequiredId } from '../../../shared/supabase/types';
-import type { ActiveBox, CommittedUnit, EntryProduct } from '../types';
+import type { ActiveBox, CommittedUnit, DuplicateMatch, EntryProduct } from '../types';
 
 interface KolilerRow {
   id: string;
@@ -101,7 +102,7 @@ export async function reopenBox(id: string, previousLog: { at: string }[]): Prom
   if (error) throw new Error(error.message);
 }
 
-export async function closeBox(id: string): Promise<void> {
+async function closeBoxRaw(id: string): Promise<void> {
   const { error } = await supabase
     .from('koliler')
     .update({ durum: 'kapali', updated_at: new Date().toISOString() })
@@ -109,6 +110,15 @@ export async function closeBox(id: string): Promise<void> {
 
   if (error) throw new Error(error.message);
 }
+
+export async function closeBox(id: string): Promise<void> {
+  await runOrQueue('goodsReceiving.closeBox', { id }, () => closeBoxRaw(id));
+}
+
+registerOfflineHandler('goodsReceiving.closeBox', async (payload) => {
+  const p = payload as { id: string };
+  await closeBoxRaw(p.id);
+});
 
 export async function lookupProductForEntry(ean: string): Promise<EntryProduct | null> {
   const { data, error } = await supabase
@@ -118,12 +128,33 @@ export async function lookupProductForEntry(ean: string): Promise<EntryProduct |
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  if (!data) return null;
+  if (data) {
+    return {
+      productId: data.id,
+      articleNo: data.article_no,
+      name: data.name,
+      requiredIds: data.required_ids as RequiredId[],
+    };
+  }
+
+  const { data: alias, error: aliasError } = await supabase
+    .from('product_ean_aliases')
+    .select('products(id, article_no, name, required_ids)')
+    .eq('ean', ean)
+    .maybeSingle();
+
+  if (aliasError) throw new Error(aliasError.message);
+  const product = (
+    alias as unknown as {
+      products: { id: string; article_no: string; name: string; required_ids: RequiredId[] } | null;
+    } | null
+  )?.products;
+  if (!product) return null;
   return {
-    productId: data.id,
-    articleNo: data.article_no,
-    name: data.name,
-    requiredIds: data.required_ids as RequiredId[],
+    productId: product.id,
+    articleNo: product.article_no,
+    name: product.name,
+    requiredIds: product.required_ids,
   };
 }
 
@@ -156,15 +187,14 @@ export async function listUnits(koliId: string): Promise<CommittedUnit[]> {
   }));
 }
 
-export async function insertUnit(
-  koliId: string,
-  input: {
-    productId?: string | null;
-    rawBarkod?: string | null;
-    identifiers?: IdentifierValues;
-    beklenmeyen?: boolean;
-  },
-): Promise<void> {
+interface InsertUnitInput {
+  productId?: string | null;
+  rawBarkod?: string | null;
+  identifiers?: IdentifierValues;
+  beklenmeyen?: boolean;
+}
+
+async function insertUnitRaw(koliId: string, input: InsertUnitInput): Promise<void> {
   const { error } = await supabase.from('koli_urunler').insert({
     koli_id: koliId,
     product_id: input.productId ?? null,
@@ -174,6 +204,39 @@ export async function insertUnit(
   });
 
   if (error) throw new Error(error.message);
+}
+
+export async function insertUnit(koliId: string, input: InsertUnitInput): Promise<void> {
+  await runOrQueue('goodsReceiving.insertUnit', { koliId, input }, () => insertUnitRaw(koliId, input));
+}
+
+registerOfflineHandler('goodsReceiving.insertUnit', async (payload) => {
+  const p = payload as { koliId: string; input: InsertUnitInput };
+  await insertUnitRaw(p.koliId, p.input);
+});
+
+export async function findDuplicateIdentifier(value: string): Promise<DuplicateMatch | null> {
+  const { data, error } = await supabase
+    .from('koli_urunler')
+    .select('created_at, koliler(barkod, siparisler(siparis_no))')
+    .or(
+      `identifiers->>IMEI1.eq.${value},identifiers->>IMEI2.eq.${value},identifiers->>SERIAL.eq.${value}`,
+    )
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+
+  const row = data as unknown as {
+    created_at: string;
+    koliler: { barkod: string; siparisler: { siparis_no: string } | null } | null;
+  };
+  return {
+    koliBarkod: row.koliler?.barkod ?? '—',
+    siparisNo: row.koliler?.siparisler?.siparis_no ?? null,
+    createdAt: row.created_at,
+  };
 }
 
 export async function deleteUnit(id: string): Promise<void> {

@@ -2,19 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { classifyIdentifier } from '../../../shared/lib/barcodeClassifier';
 import { useRealtimeRefresh } from '../../../shared/realtime/useRealtimeRefresh';
 import { playSuccess, playStep, playError, vibrateSuccess, vibrateStep, vibrateError } from '../../../shared/feedback/feedback';
-import { listOrders } from '../../orders/api/orders.api';
-import {
-  lookupProductForEntry,
-  listUnits,
-  insertUnit,
-  deleteUnit,
-  countUnitsByProductForOrder,
-  findDuplicateIdentifier,
-} from '../api/goodsReceiving.api';
+import { lookupProductForEntry, findDuplicateIdentifier } from '../../goodsReceiving/api/goodsReceiving.api';
+import { listTransferUnits, insertTransferUnit, deleteTransferUnit } from '../api/transfer.api';
 import type { RequiredId } from '../../../shared/supabase/types';
-import type { ActiveBox, CaptureState, CommittedUnit, ProductProgress } from '../types';
+import type { TransferCaptureState, TransferSiparis, TransferUnit } from '../types';
 
-function determineAutoField(code: string, capture: CaptureState): RequiredId | null {
+function determineAutoField(code: string, capture: TransferCaptureState): RequiredId | null {
   const required = capture.product?.requiredIds ?? [];
   const missing = required.filter((id) => !capture.identifiers[id]);
   if (missing.length === 0) return null;
@@ -28,51 +21,20 @@ function determineAutoField(code: string, capture: CaptureState): RequiredId | n
   return missing[0];
 }
 
-export function useProductCapture(box: ActiveBox) {
-  const [units, setUnits] = useState<CommittedUnit[]>([]);
-  const [capture, setCapture] = useState<CaptureState | null>(null);
-  const [orderItems, setOrderItems] = useState<{ productId: string; beklenen: number }[]>([]);
-  const [productCounts, setProductCounts] = useState<Record<string, number>>({});
+export function useTransferCapture(transfer: TransferSiparis) {
+  const [units, setUnits] = useState<TransferUnit[]>([]);
+  const [capture, setCapture] = useState<TransferCaptureState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshAll = useCallback(async () => {
-    const nextUnits = await listUnits(box.id);
-    setUnits(nextUnits);
-
-    if (box.siparisId) {
-      const [orders, counts] = await Promise.all([
-        listOrders(),
-        countUnitsByProductForOrder(box.siparisId),
-      ]);
-      const order = orders.find((o) => o.id === box.siparisId);
-      setOrderItems(order ? order.items.map((i) => ({ productId: i.productId, beklenen: i.beklenen })) : []);
-      setProductCounts(counts);
-    } else {
-      setOrderItems([]);
-      setProductCounts({});
-    }
-  }, [box.id, box.siparisId]);
+  const refresh = useCallback(async () => {
+    setUnits(await listTransferUnits(transfer.id));
+  }, [transfer.id]);
 
   useEffect(() => {
-    refreshAll().catch((e) => setError(e instanceof Error ? e.message : 'Veriler yüklenemedi'));
-  }, [refreshAll]);
+    refresh().catch((e) => setError(e instanceof Error ? e.message : 'Veriler yüklenemedi'));
+  }, [refresh]);
 
-  useRealtimeRefresh(['koliler', 'koli_urunler'], refreshAll);
-
-  const orderProgress: ProductProgress | null = box.siparisId
-    ? {
-        girilen: Object.values(productCounts).reduce((sum, n) => sum + n, 0),
-        beklenen: orderItems.reduce((sum, i) => sum + i.beklenen, 0),
-      }
-    : null;
-
-  const currentProductProgress: ProductProgress | null = capture?.product
-    ? (() => {
-        const item = orderItems.find((i) => i.productId === capture.product!.productId);
-        if (!item) return null;
-        return { girilen: productCounts[capture.product.productId] ?? 0, beklenen: item.beklenen };
-      })()
-    : null;
+  useRealtimeRefresh(['transfer_urunler'], refresh);
 
   const handleScan = useCallback(
     async (code: string) => {
@@ -91,7 +53,7 @@ export function useProductCapture(box: ActiveBox) {
         }
 
         const required = capture.product?.requiredIds ?? [];
-        if (required.length === 0) return; // hiçbir slot beklenmiyor, ek kod okutmanın anlamı yok
+        if (required.length === 0) return;
 
         const field = capture.targetField ?? determineAutoField(code, capture);
         if (!field) {
@@ -143,9 +105,9 @@ export function useProductCapture(box: ActiveBox) {
     setError(null);
     try {
       if (capture.isUnexpected) {
-        await insertUnit(box.id, { rawBarkod: capture.ean, beklenmeyen: true });
+        await insertTransferUnit(transfer.id, { rawBarkod: capture.ean, beklenmeyen: true });
       } else if (capture.product) {
-        await insertUnit(box.id, {
+        await insertTransferUnit(transfer.id, {
           productId: capture.product.productId,
           identifiers: capture.identifiers,
         });
@@ -153,13 +115,13 @@ export function useProductCapture(box: ActiveBox) {
       setCapture(null);
       playSuccess();
       vibrateSuccess();
-      await refreshAll();
+      await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Kaydedilemedi');
       playError();
       vibrateError();
     }
-  }, [box.id, canAccept, capture, refreshAll]);
+  }, [transfer.id, canAccept, capture, refresh]);
 
   const handleDiscard = useCallback(() => {
     setCapture(null);
@@ -168,26 +130,14 @@ export function useProductCapture(box: ActiveBox) {
   const removeUnit = useCallback(
     async (id: string) => {
       try {
-        await deleteUnit(id);
-        await refreshAll();
+        await deleteTransferUnit(id);
+        await refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Birim silinemedi');
       }
     },
-    [refreshAll],
+    [refresh],
   );
 
-  return {
-    units,
-    capture,
-    canAccept,
-    orderProgress,
-    currentProductProgress,
-    error,
-    handleScan,
-    setTargetField,
-    handleAccept,
-    handleDiscard,
-    removeUnit,
-  };
+  return { units, capture, canAccept, error, handleScan, setTargetField, handleAccept, handleDiscard, removeUnit };
 }

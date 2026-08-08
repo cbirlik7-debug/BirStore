@@ -30,12 +30,19 @@ export interface EntryProduct {
   requiredIds: RequiredId[];
 }
 
+export interface DuplicateMatch {
+  koliBarkod: string;
+  siparisNo: string | null;
+  createdAt: string;
+}
+
 export interface CaptureState {
   ean: string;
   product: EntryProduct | null;
   isUnexpected: boolean;
   identifiers: IdentifierValues;
   targetField: RequiredId | null;
+  duplicateWarning: DuplicateMatch | null;
 }
 
 export interface ProductProgress {

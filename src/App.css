@@ -381,6 +381,172 @@
   color: var(--badge-green-fg);
 }
 
+.badge-red {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.badge-orange {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.tutanak-line-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tutanak-line-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-surface);
+}
+
+.tutanak-line-photo {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.tutanak-start {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tutanak-line-form {
+  margin-bottom: 12px;
+}
+
+.reports-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+
+.reports-tab {
+  background: transparent;
+}
+
+.reports-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+
+.unexpected-link-form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.duplicate-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.duplicate-group {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--bg-surface);
+}
+
+.duplicate-group h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.duplicate-group ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.duplicate-group li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.daily-report-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.transfer-existing-list {
+  margin-top: 24px;
+}
+
+.transfer-existing-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transfer-existing-list li button {
+  width: 100%;
+  text-align: left;
+}
+
+.sayim-lock-actions,
+.sayim-count-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sayim-item-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sayim-item-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-surface);
+}
+
+.sayim-item-list li input[type='number'] {
+  width: 70px;
+}
+
+.sayim-row-mismatch {
+  color: var(--danger);
+}
+
 .btn-danger {
   background: var(--danger);
   border-color: var(--danger);
@@ -743,6 +909,15 @@
 .capture-field-value {
   color: var(--text-h);
   font-weight: 600;
+}
+
+.capture-panel-duplicate-warning {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
 }
 
 .capture-panel-actions {

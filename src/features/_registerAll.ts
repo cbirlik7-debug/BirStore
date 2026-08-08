@@ -7,3 +7,8 @@ import './definitions';
 import './orders';
 import './boxDefinitions';
 import './orderTracking';
+import './tutanak';
+import './reports';
+import './transfer';
+import './sayim';
+import './userManagement';

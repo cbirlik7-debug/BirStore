@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Nav } from './Nav';
 import { useAuth } from '../shared/auth/useAuth';
+import { useOfflineQueueStatus } from '../shared/offline/useOfflineQueueStatus';
 import type { Role } from '../shared/permissions/types';
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -14,6 +15,7 @@ export function AppShell() {
   const { role, signOut } = useAuth();
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
+  const { pending, online } = useOfflineQueueStatus();
 
   useEffect(() => {
     setNavOpen(false);
@@ -39,7 +41,8 @@ export function AppShell() {
         </div>
         <Nav />
         <div className="sidebar-footer">
-          <span className="db-status">Veritabanı: bağlı ✓</span>
+          <span className="db-status">{online ? 'Çevrimiçi ✓' : 'Çevrimdışı'}</span>
+          {pending > 0 && <span className="badge badge-orange">{pending} bekleyen kayıt</span>}
           <button type="button" onClick={() => signOut()}>
             Çıkış
           </button>
