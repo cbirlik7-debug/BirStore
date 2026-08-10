@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { listOrdersWithProgress, getOrderItemProgress } from './api/orderTracking.api';
+import { listOrdersWithProgress, getOrderItemProgress, completeOrder } from './api/orderTracking.api';
 import { useRealtimeRefresh } from '../../shared/realtime/useRealtimeRefresh';
 import type { OrderProgress, OrderItemProgress } from './types';
 
@@ -10,6 +10,7 @@ export function OrderTrackingPage() {
   const [items, setItems] = useState<OrderItemProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [completing, setCompleting] = useState(false);
 
   const refresh = useCallback(() => {
     listOrdersWithProgress()
@@ -22,7 +23,7 @@ export function OrderTrackingPage() {
     refresh();
   }, [refresh]);
 
-  useRealtimeRefresh(['koliler', 'koli_urunler', 'siparisler'], refresh);
+  useRealtimeRefresh(['koliler', 'koli_urunler', 'siparisler', 'tamamlanan_siparisler'], refresh);
 
   async function openOrder(order: OrderProgress) {
     setSelected(order);
@@ -34,7 +35,23 @@ export function OrderTrackingPage() {
     }
   }
 
+  async function handleComplete() {
+    if (!selected) return;
+    setCompleting(true);
+    setError(null);
+    try {
+      const { kayitNo } = await completeOrder(selected.id);
+      setSelected({ ...selected, kayitNo });
+      setOrders((prev) => prev.map((o) => (o.id === selected.id ? { ...o, kayitNo } : o)));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Sipariş tamamlanamadı');
+    } finally {
+      setCompleting(false);
+    }
+  }
+
   if (selected) {
+    const allComplete = items.length > 0 && items.every((i) => i.girilen >= i.beklenen);
     return (
       <div className="order-tracking-page">
         <button type="button" onClick={() => setSelected(null)}>
@@ -43,9 +60,18 @@ export function OrderTrackingPage() {
         <h2>
           {selected.siparisNo} {selected.tedarikciAdi ? `— ${selected.tedarikciAdi}` : ''}
         </h2>
-        <Link to={`/tutanaklar?siparisId=${selected.id}`} className="btn-accept" role="button">
-          Tutanak Hazırla
-        </Link>
+        <div className="order-detail-actions">
+          <Link to={`/tutanaklar?siparisId=${selected.id}`} className="btn-accept" role="button">
+            Tutanak Hazırla
+          </Link>
+          {selected.kayitNo ? (
+            <span className="badge badge-green">✓ Tamamlandı — Kayıt No: {selected.kayitNo}</span>
+          ) : (
+            <button type="button" disabled={!allComplete || completing} onClick={handleComplete}>
+              {completing ? 'Tamamlanıyor...' : 'Siparişi Tamamla'}
+            </button>
+          )}
+        </div>
         {error && <p role="alert">{error}</p>}
         <ul className="order-item-progress-list">
           {items.map((item) => (
@@ -92,9 +118,13 @@ export function OrderTrackingPage() {
                   <strong>{order.siparisNo}</strong>
                   <span>{order.tedarikciAdi ?? '—'}</span>
                 </div>
-                <div className="progress-bar">
-                  <div className="progress-bar-fill" style={{ width: `${percent}%` }} />
-                </div>
+                {order.kayitNo ? (
+                  <span className="badge badge-green">✓ Tamamlandı — {order.kayitNo}</span>
+                ) : (
+                  <div className="progress-bar">
+                    <div className="progress-bar-fill" style={{ width: `${percent}%` }} />
+                  </div>
+                )}
                 <span className="progress-label">
                   {order.girilenToplam}/{order.beklenenToplam}
                 </span>

@@ -23,10 +23,17 @@ export interface SupplierPerformance {
   sorunOrani: number;
 }
 
+export interface CompletedOrder {
+  siparisNo: string;
+  kayitNo: string;
+  createdAt: string;
+}
+
 export interface DailyReport {
   tarih: string;
   koliSayisi: number;
   urunSayisi: number;
   tutanakSayisi: number;
   urunDokum: { articleNo: string; productName: string; adet: number }[];
+  tamamlananSiparisler: CompletedOrder[];
 }

@@ -24,7 +24,7 @@ export function DashboardPage() {
     refresh();
   }, [refresh]);
 
-  useRealtimeRefresh(['koliler', 'koli_urunler', 'siparisler', 'tutanaklar'], refresh);
+  useRealtimeRefresh(['koliler', 'koli_urunler', 'siparisler', 'tutanaklar', 'tamamlanan_siparisler'], refresh);
 
   return (
     <div className="dashboard-page">
@@ -67,6 +67,10 @@ export function DashboardPage() {
               <div className="stat-tile">
                 <strong>{stats.okutulanUrun}</strong>
                 <span>Okutulan Ürün</span>
+              </div>
+              <div className="stat-tile">
+                <strong>{stats.tamamlananSiparis}</strong>
+                <span>Tamamlanan Sipariş</span>
               </div>
             </div>
 

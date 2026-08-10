@@ -554,6 +554,103 @@
   color: var(--danger);
 }
 
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.error-boundary h1 {
+  color: var(--text-h);
+  font-size: 20px;
+  margin: 0;
+}
+
+.order-coverage-list,
+.scanned-records-list {
+  margin-top: 20px;
+}
+
+.order-coverage-list h4,
+.scanned-records-list h4 {
+  color: var(--text-h);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.order-coverage-list ul,
+.scanned-records-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-coverage-list li,
+.scanned-records-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  font-size: 13px;
+}
+
+.order-coverage-list .progress-bar {
+  width: 100px;
+}
+
+.completed-orders-list {
+  margin: 16px 0;
+}
+
+.completed-orders-list h4 {
+  color: var(--text-h);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.completed-orders-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.completed-orders-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  font-size: 13px;
+}
+
+.order-detail-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
 .btn-danger {
   background: var(--danger);
   border-color: var(--danger);

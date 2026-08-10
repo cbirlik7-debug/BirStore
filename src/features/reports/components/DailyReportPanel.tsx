@@ -77,7 +77,26 @@ export function DailyReportPanel() {
               <strong>{report.tutanakSayisi}</strong>
               <span>Tutanak</span>
             </div>
+            <div className="stat-tile">
+              <strong>{report.tamamlananSiparisler.length}</strong>
+              <span>Tamamlanan Sipariş</span>
+            </div>
           </div>
+
+          {report.tamamlananSiparisler.length > 0 && (
+            <div className="completed-orders-list">
+              <h4>Tamamlanan Siparişler</h4>
+              <ul>
+                {report.tamamlananSiparisler.map((o) => (
+                  <li key={o.kayitNo}>
+                    <span>{o.siparisNo}</span>
+                    <span className="badge badge-green">{o.kayitNo}</span>
+                    <span>{new Date(o.createdAt).toLocaleTimeString('tr-TR')}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {report.urunDokum.length === 0 ? (
             <p>Bu tarihte ürün girişi yok.</p>

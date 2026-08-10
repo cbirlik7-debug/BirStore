@@ -467,6 +467,20 @@ export interface Database {
           },
         ];
       };
+      tamamlanan_siparisler: {
+        Row: { siparis_id: string; kayit_no: string; created_at: string };
+        Insert: { siparis_id: string; kayit_no: string };
+        Update: Record<string, never>;
+        Relationships: [
+          {
+            foreignKeyName: 'tamamlanan_siparisler_siparis_id_fkey';
+            columns: ['siparis_id'];
+            isOneToOne: true;
+            referencedRelation: 'siparisler';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {

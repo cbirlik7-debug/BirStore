@@ -4,6 +4,7 @@ export interface OrderProgress {
   tedarikciAdi: string | null;
   beklenenToplam: number;
   girilenToplam: number;
+  kayitNo: string | null;
 }
 
 export interface OrderItemProgress {

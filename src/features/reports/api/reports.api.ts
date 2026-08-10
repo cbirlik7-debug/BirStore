@@ -1,7 +1,6 @@
 import { supabase } from '../../../shared/supabase/client';
-import { listOrders } from '../../orders/api/orders.api';
-import { countUnitsByProductForOrder, deleteUnit } from '../../goodsReceiving/api/goodsReceiving.api';
-import type { DailyReport, DuplicateRecord, SupplierPerformance, UnexpectedProduct } from '../types';
+import { deleteUnit } from '../../goodsReceiving/api/goodsReceiving.api';
+import type { CompletedOrder, DailyReport, DuplicateRecord, SupplierPerformance, UnexpectedProduct } from '../types';
 
 // --- Beklenmeyen Ürünler ---
 
@@ -86,24 +85,20 @@ interface SupplierTutanakRow {
 }
 
 export async function listSupplierPerformance(): Promise<SupplierPerformance[]> {
-  const [{ data: orderRows, error: ordersError }, { data: tutanakRows, error: tutanaklarError }, orders] =
-    await Promise.all([
-      supabase.from('siparisler').select('id, tedarikci_id, tedarikciler(ad)'),
-      supabase.from('tutanaklar').select('siparisler(tedarikci_id)'),
-      listOrders(),
-    ]);
+  const [
+    { data: orderRows, error: ordersError },
+    { data: tutanakRows, error: tutanaklarError },
+    { data: completedRows, error: completedError },
+  ] = await Promise.all([
+    supabase.from('siparisler').select('id, tedarikci_id, tedarikciler(ad)'),
+    supabase.from('tutanaklar').select('siparisler(tedarikci_id)'),
+    supabase.from('tamamlanan_siparisler').select('siparis_id'),
+  ]);
   if (ordersError) throw new Error(ordersError.message);
   if (tutanaklarError) throw new Error(tutanaklarError.message);
+  if (completedError) throw new Error(completedError.message);
 
-  const progress = await Promise.all(
-    orders.map(async (o) => {
-      const counts = await countUnitsByProductForOrder(o.id);
-      const girilen = o.items.reduce((sum, i) => sum + (counts[i.productId] ?? 0), 0);
-      const beklenen = o.items.reduce((sum, i) => sum + i.beklenen, 0);
-      return { id: o.id, complete: beklenen > 0 && girilen >= beklenen };
-    }),
-  );
-  const completeMap = new Map(progress.map((p) => [p.id, p.complete]));
+  const completedIds = new Set((completedRows ?? []).map((r) => r.siparis_id));
 
   const bySupplier = new Map<
     string,
@@ -118,7 +113,7 @@ export async function listSupplierPerformance(): Promise<SupplierPerformance[]> 
       tutanakSayisi: 0,
     };
     entry.siparisSayisi += 1;
-    if (completeMap.get(row.id)) entry.tamamlananSayisi += 1;
+    if (completedIds.has(row.id)) entry.tamamlananSayisi += 1;
     bySupplier.set(row.tedarikci_id, entry);
   }
   for (const row of (tutanakRows ?? []) as unknown as SupplierTutanakRow[]) {
@@ -173,6 +168,22 @@ export async function getDailyReport(dateStr: string): Promise<DailyReport> {
     .not('product_id', 'is', null);
   if (unitsError) throw new Error(unitsError.message);
 
+  const { data: completedRows, error: completedError } = await supabase
+    .from('tamamlanan_siparisler')
+    .select('kayit_no, created_at, siparisler(siparis_no)')
+    .gte('created_at', start)
+    .lte('created_at', end)
+    .order('created_at', { ascending: false });
+  if (completedError) throw new Error(completedError.message);
+
+  const tamamlananSiparisler: CompletedOrder[] = (
+    (completedRows ?? []) as unknown as { kayit_no: string; created_at: string; siparisler: { siparis_no: string } | null }[]
+  ).map((row) => ({
+    siparisNo: row.siparisler?.siparis_no ?? '—',
+    kayitNo: row.kayit_no,
+    createdAt: row.created_at,
+  }));
+
   const rows = (units ?? []) as unknown as DailyUnitRow[];
   const byProduct = new Map<string, { articleNo: string; productName: string; adet: number }>();
   for (const row of rows) {
@@ -192,5 +203,6 @@ export async function getDailyReport(dateStr: string): Promise<DailyReport> {
     urunSayisi: rows.length,
     tutanakSayisi: tutanakSayisi ?? 0,
     urunDokum: Array.from(byProduct.values()).sort((a, b) => b.adet - a.adet),
+    tamamlananSiparisler,
   };
 }
