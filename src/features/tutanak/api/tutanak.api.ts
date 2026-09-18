@@ -1,4 +1,4 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import type { Tutanak, TutanakDurum, TutanakLine } from '../types';
 
 interface TutanakRow {
@@ -42,6 +42,30 @@ function mapTutanakRow(row: TutanakRow): Tutanak {
 }
 
 export async function listTutanaklar(): Promise<Tutanak[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        id: 'tut-1',
+        siparisId: 'ord-1',
+        siparisNo: 'SIP-2026-0811',
+        tutanakNo: 'TUT-849102',
+        createdAt: '2026-08-11T12:00:00Z',
+        satirlar: [
+          {
+            id: 'line-1',
+            productId: 'prod-1',
+            articleNo: 'MM-IP15P-256',
+            productName: 'Apple iPhone 15 Pro 256GB Titanyum',
+            durum: 'hasarli',
+            adet: 1,
+            aciklama: 'Koli ezilmiş, kutu hasarlı',
+            fotoUrl: null,
+          },
+        ],
+      },
+    ];
+  }
+
   const { data, error } = await supabase
     .from('tutanaklar')
     .select(TUTANAK_SELECT)

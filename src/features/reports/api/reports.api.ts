@@ -1,4 +1,4 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { deleteUnit } from '../../goodsReceiving/api/goodsReceiving.api';
 import type { CompletedOrder, DailyReport, DuplicateRecord, SupplierPerformance, UnexpectedProduct } from '../types';
 
@@ -12,6 +12,18 @@ interface UnexpectedRow {
 }
 
 export async function listUnexpectedProducts(): Promise<UnexpectedProduct[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        id: 'unexp-1',
+        rawBarkod: '8690001928374',
+        koliBarkod: 'KL-849201948',
+        siparisNo: 'SIP-2026-0811',
+        createdAt: '2026-08-11T10:14:00Z',
+      },
+    ];
+  }
+
   const { data, error } = await supabase
     .from('koli_urunler')
     .select('id, raw_barkod, created_at, koliler(barkod, siparisler(siparis_no))')
@@ -33,6 +45,10 @@ export async function linkUnexpectedProduct(
   rawBarkod: string,
   productId: string,
 ): Promise<void> {
+  if (isDemoMode()) {
+    return;
+  }
+
   if (rawBarkod) {
     const { error: aliasError } = await supabase
       .from('product_ean_aliases')
@@ -59,6 +75,10 @@ interface DuplicateRow {
 }
 
 export async function listDuplicateIdentifiers(): Promise<DuplicateRecord[]> {
+  if (isDemoMode()) {
+    return [];
+  }
+
   const { data, error } = await supabase.rpc('find_duplicate_identifiers');
   if (error) throw new Error(error.message);
   return ((data ?? []) as DuplicateRow[]).map((row) => ({
@@ -85,6 +105,35 @@ interface SupplierTutanakRow {
 }
 
 export async function listSupplierPerformance(): Promise<SupplierPerformance[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        tedarikciId: 'sup-1',
+        tedarikciAdi: 'Apple Türkiye Dağıtım Ltd.',
+        siparisSayisi: 12,
+        tamamlananSayisi: 11,
+        tutanakSayisi: 1,
+        sorunOrani: 1 / 12,
+      },
+      {
+        tedarikciId: 'sup-2',
+        tedarikciAdi: 'Samsung Elektronik A.Ş.',
+        siparisSayisi: 8,
+        tamamlananSayisi: 8,
+        tutanakSayisi: 0,
+        sorunOrani: 0,
+      },
+      {
+        tedarikciId: 'sup-3',
+        tedarikciAdi: 'Sony Eurasia Pazarlama',
+        siparisSayisi: 6,
+        tamamlananSayisi: 5,
+        tutanakSayisi: 1,
+        sorunOrani: 1 / 6,
+      },
+    ];
+  }
+
   const [
     { data: orderRows, error: ordersError },
     { data: tutanakRows, error: tutanaklarError },
@@ -143,6 +192,23 @@ interface DailyUnitRow {
 }
 
 export async function getDailyReport(dateStr: string): Promise<DailyReport> {
+  if (isDemoMode()) {
+    return {
+      tarih: dateStr,
+      koliSayisi: 14,
+      urunSayisi: 45,
+      tutanakSayisi: 1,
+      urunDokum: [
+        { articleNo: 'MM-IP15P-256', productName: 'Apple iPhone 15 Pro 256GB Titanyum', adet: 20 },
+        { articleNo: 'MM-SGS24U-512', productName: 'Samsung Galaxy S24 Ultra 512GB Gri', adet: 15 },
+        { articleNo: 'MM-AW-S9-45', productName: 'Apple Watch Series 9 GPS 45mm Gece Yarısı', adet: 10 },
+      ],
+      tamamlananSiparisler: [
+        { siparisNo: 'SIP-2026-0812', kayitNo: 'KYT-904128', createdAt: `${dateStr}T15:30:00Z` },
+      ],
+    };
+  }
+
   const start = `${dateStr}T00:00:00`;
   const end = `${dateStr}T23:59:59.999`;
 

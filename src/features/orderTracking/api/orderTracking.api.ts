@@ -1,6 +1,7 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { listOrders } from '../../orders/api/orders.api';
 import { countUnitsByProductForOrder } from '../../goodsReceiving/api/goodsReceiving.api';
+import { MOCK_ORDER_PROGRESS } from '../../../shared/mock/mockData';
 import type { OrderProgress, OrderItemProgress } from '../types';
 
 async function getCompletionMap(): Promise<Map<string, string>> {
@@ -10,6 +11,10 @@ async function getCompletionMap(): Promise<Map<string, string>> {
 }
 
 export async function listOrdersWithProgress(): Promise<OrderProgress[]> {
+  if (isDemoMode()) {
+    return MOCK_ORDER_PROGRESS;
+  }
+
   const [orders, completion] = await Promise.all([listOrders(), getCompletionMap()]);
 
   return Promise.all(
@@ -36,6 +41,16 @@ export async function getOrderItemProgress(orderId: string): Promise<OrderItemPr
   const order = orders.find((o) => o.id === orderId);
   if (!order) throw new Error('Sipariş bulunamadı');
 
+  if (isDemoMode()) {
+    return order.items.map((item, idx) => ({
+      productId: item.productId,
+      articleNo: item.articleNo,
+      productName: item.productName,
+      beklenen: item.beklenen,
+      girilen: idx === 0 ? item.beklenen : Math.floor(item.beklenen / 2),
+    }));
+  }
+
   const counts = await countUnitsByProductForOrder(orderId);
 
   return order.items.map((item) => ({
@@ -53,6 +68,10 @@ function generateKayitNo(): string {
 }
 
 export async function completeOrder(orderId: string): Promise<{ kayitNo: string }> {
+  if (isDemoMode()) {
+    return { kayitNo: generateKayitNo() };
+  }
+
   for (let attempt = 0; attempt < 3; attempt++) {
     const kayitNo = generateKayitNo();
     const { data, error } = await supabase

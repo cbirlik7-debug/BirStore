@@ -1,4 +1,5 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
+import { getMockOrders, addMockOrder } from '../../../shared/mock/mockData';
 import type { Order, OrderLineItem } from '../types';
 
 interface OrderRow {
@@ -14,6 +15,10 @@ interface OrderRow {
 }
 
 export async function listOrders(): Promise<Order[]> {
+  if (isDemoMode()) {
+    return getMockOrders();
+  }
+
   const { data, error } = await supabase
     .from('siparisler')
     .select(
@@ -46,6 +51,23 @@ export async function createOrder(input: {
   irsaliyeNo: string | null;
   items: { productId: string; beklenen: number }[];
 }): Promise<void> {
+  if (isDemoMode()) {
+    addMockOrder({
+      id: `ord-${Date.now()}`,
+      siparisNo: input.siparisNo,
+      tedarikciAdi: 'Seçili Tedarikçi',
+      irsaliyeNo: input.irsaliyeNo,
+      createdAt: new Date().toISOString(),
+      items: input.items.map((it) => ({
+        productId: it.productId,
+        articleNo: 'ART-MOCK',
+        productName: 'Örnek Ürün',
+        beklenen: it.beklenen,
+      })),
+    });
+    return;
+  }
+
   const { data, error } = await supabase
     .from('siparisler')
     .insert({
@@ -71,6 +93,10 @@ export async function createOrder(input: {
 }
 
 export async function deleteOrder(id: string): Promise<void> {
+  if (isDemoMode()) {
+    return;
+  }
+
   const { error } = await supabase.from('siparisler').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }

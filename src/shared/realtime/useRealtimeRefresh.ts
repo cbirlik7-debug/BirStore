@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { supabase } from '../supabase/client';
+import { supabase, isSupabaseConfigured, isDemoMode } from '../supabase/client';
 
 /**
  * Verilen tablolarda değişiklik olduğunda `onChange`'i debounce'lu tetikler.
@@ -12,18 +12,24 @@ export function useRealtimeRefresh(tables: string[], onChange: () => void, debou
   const tablesKey = tables.join(',');
 
   useEffect(() => {
-    const channel = supabase.channel(`realtime:${tablesKey}`);
-    for (const table of tablesKey.split(',')) {
-      channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
-        if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => onChangeRef.current(), debounceMs);
-      });
-    }
-    channel.subscribe();
+    if (!isSupabaseConfigured || isDemoMode()) return;
 
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      supabase.removeChannel(channel);
-    };
+    try {
+      const channel = supabase.channel(`realtime:${tablesKey}`);
+      for (const table of tablesKey.split(',')) {
+        channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
+          if (timerRef.current) clearTimeout(timerRef.current);
+          timerRef.current = setTimeout(() => onChangeRef.current(), debounceMs);
+        });
+      }
+      channel.subscribe();
+
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        supabase.removeChannel(channel);
+      };
+    } catch (err) {
+      console.warn('Realtime bağlantısı kurulamadı:', err);
+    }
   }, [tablesKey, debounceMs]);
 }

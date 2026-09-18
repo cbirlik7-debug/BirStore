@@ -1,6 +1,7 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { listOrders } from '../../orders/api/orders.api';
 import { countUnitsByProductForOrder } from '../../goodsReceiving/api/goodsReceiving.api';
+import { getMockProducts } from '../../../shared/mock/mockData';
 import type { IdentifierValues } from '../../../shared/supabase/types';
 
 export interface ProductMatch {
@@ -40,6 +41,13 @@ export interface ScannedRecord {
 }
 
 export async function searchProduct(query: string): Promise<ProductMatch[]> {
+  if (isDemoMode()) {
+    const q = query.trim().toLowerCase();
+    return getMockProducts()
+      .filter((p) => p.ean.includes(q) || p.articleNo.toLowerCase().includes(q) || p.name.toLowerCase().includes(q))
+      .map((p) => ({ id: p.id, ean: p.ean, articleNo: p.articleNo, name: p.name }));
+  }
+
   const { data, error } = await supabase
     .from('products')
     .select('id, ean, article_no, name')
@@ -52,6 +60,25 @@ export async function searchProduct(query: string): Promise<ProductMatch[]> {
 }
 
 export async function getShelfBreakdown(productId: string): Promise<ShelfBreakdownRow[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        shelfId: 'shelf-a1',
+        shelfName: 'Raf A1-02 (Merkez Depo)',
+        quantity: 14,
+        placedAt: '2026-08-01T10:00:00Z',
+        updatedAt: '2026-08-11T12:00:00Z',
+      },
+      {
+        shelfId: 'shelf-b3',
+        shelfName: 'Raf B3-05 (Satışa Hazır)',
+        quantity: 8,
+        placedAt: '2026-08-05T14:30:00Z',
+        updatedAt: '2026-08-10T09:15:00Z',
+      },
+    ];
+  }
+
   const { data, error } = await supabase
     .from('shelf_stock')
     .select('shelf_id, quantity, placed_at, updated_at, shelves(name, barcode)')
@@ -120,6 +147,20 @@ interface TransferMatchRow {
 }
 
 export async function findScannedRecords(value: string, productId?: string): Promise<ScannedRecord[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        id: 'rec-1',
+        source: 'mal_kabul',
+        context: 'KL-849201948',
+        siparisNo: 'SIP-2026-0811',
+        identifiers: { SERIAL: value || 'SER-9948201' },
+        rawBarkod: value,
+        createdAt: new Date().toISOString(),
+      },
+    ];
+  }
+
   const orClause = buildIdentifierOrClause(value, productId);
 
   const [koliResult, transferResult] = await Promise.all([

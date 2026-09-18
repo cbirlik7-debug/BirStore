@@ -1,10 +1,22 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { runOrQueue, registerOfflineHandler } from '../../../shared/offline/offlineQueue';
 import type { Sayim, ShelfDiscrepancy, ShelfLockInfo } from '../types';
 
 const LOCK_STALE_MS = 30 * 60 * 1000;
 
 export async function listSayimlar(): Promise<Sayim[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        id: 'sayim-1',
+        ad: '2026 Q3 Genel Depo Sayımı',
+        baslangic: '2026-08-01T08:00:00Z',
+        bitis: null,
+        durum: 'acik',
+      },
+    ];
+  }
+
   const { data, error } = await supabase
     .from('sayimlar')
     .select('id, ad, baslangic, bitis, durum')

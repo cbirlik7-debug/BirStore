@@ -1,9 +1,22 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { runOrQueue, registerOfflineHandler } from '../../../shared/offline/offlineQueue';
 import type { IdentifierValues } from '../../../shared/supabase/types';
 import type { DepoKodu, TransferSiparis, TransferTip, TransferUnit } from '../types';
 
+const MOCK_DEPO_KODLARI: DepoKodu[] = [
+  { kod: '5', ad: '5 - Teşhir' },
+  { kod: '6', ad: '6 - Mağaza Deposu (Satışa Açık)' },
+  { kod: '9', ad: '9 - Satışa' },
+  { kod: '11', ad: '11 - Servis' },
+  { kod: '30', ad: '30 - Giden Transfer / İade' },
+  { kod: '99', ad: '99 - Gelen Ürünler' },
+];
+
 export async function listDepoKodlari(): Promise<DepoKodu[]> {
+  if (isDemoMode()) {
+    return MOCK_DEPO_KODLARI;
+  }
+
   const { data, error } = await supabase.from('depo_kodlari').select('kod, ad').order('kod');
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -65,6 +78,20 @@ export async function createTransfer(input: {
 }
 
 export async function listTransferOptions(): Promise<TransferSiparis[]> {
+  if (isDemoMode()) {
+    return [
+      {
+        id: 'trf-1',
+        transferNo: 'TRF-102948',
+        kaynakDepoKodu: '99',
+        hedefDepoKodu: '6',
+        tip: 'transfer',
+        aciklama: 'Mal kabulden mağaza deposuna transfer',
+        createdAt: '2026-08-11T14:00:00Z',
+      },
+    ];
+  }
+
   const { data, error } = await supabase
     .from('transfer_siparisleri')
     .select(TRANSFER_SELECT)

@@ -1,5 +1,6 @@
-import { supabase } from '../../../shared/supabase/client';
+import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { runOrQueue, registerOfflineHandler } from '../../../shared/offline/offlineQueue';
+import { getMockProducts, MOCK_ORDERS } from '../../../shared/mock/mockData';
 import type { IdentifierValues, RequiredId } from '../../../shared/supabase/types';
 import type { ActiveBox, CommittedUnit, DuplicateMatch, EntryProduct } from '../types';
 
@@ -35,6 +36,21 @@ const BOX_SELECT =
   'id, barkod, tip, durum, siparis_id, magaza_kodu, uyari, reopen_log, siparisler(siparis_no), magazalar(ad)';
 
 export async function findBoxByBarcode(barkod: string): Promise<ActiveBox | null> {
+  if (isDemoMode()) {
+    return {
+      id: 'demo-box-1',
+      barkod: barkod || 'KL-849201948',
+      tip: 'eirsaliye',
+      durum: 'acik',
+      siparisId: 'ord-1',
+      siparisNo: 'SIP-2026-0811',
+      magazaKodu: 'IST-01',
+      magazaAdi: 'MediaMarkt Meydan İstanbul',
+      uyari: null,
+      reopenLog: [],
+    };
+  }
+
   const { data, error } = await supabase
     .from('koliler')
     .select(BOX_SELECT)
@@ -121,6 +137,16 @@ registerOfflineHandler('goodsReceiving.closeBox', async (payload) => {
 });
 
 export async function lookupProductForEntry(ean: string): Promise<EntryProduct | null> {
+  if (isDemoMode()) {
+    const found = getMockProducts().find((p) => p.ean === ean) || getMockProducts()[0];
+    return {
+      productId: found.id,
+      articleNo: found.articleNo,
+      name: found.name,
+      requiredIds: found.requiredIds,
+    };
+  }
+
   const { data, error } = await supabase
     .from('products')
     .select('id, article_no, name, required_ids')
@@ -247,6 +273,10 @@ export async function deleteUnit(id: string): Promise<void> {
 export async function countUnitsByProductForOrder(
   orderId: string,
 ): Promise<Record<string, number>> {
+  if (isDemoMode()) {
+    return { 'prod-1': 15, 'prod-5': 7 };
+  }
+
   const { data: boxes, error: boxesError } = await supabase
     .from('koliler')
     .select('id')
@@ -272,6 +302,10 @@ export async function countUnitsByProductForOrder(
 }
 
 export async function getBoxCounts(): Promise<{ total: number; acik: number }> {
+  if (isDemoMode()) {
+    return { total: 18, acik: 4 };
+  }
+
   const { count: total, error: totalError } = await supabase
     .from('koliler')
     .select('id', { count: 'exact', head: true });
@@ -287,6 +321,10 @@ export async function getBoxCounts(): Promise<{ total: number; acik: number }> {
 }
 
 export async function getUnitCount(): Promise<number> {
+  if (isDemoMode()) {
+    return 45;
+  }
+
   const { count, error } = await supabase
     .from('koli_urunler')
     .select('id', { count: 'exact', head: true });
@@ -295,6 +333,10 @@ export async function getUnitCount(): Promise<number> {
 }
 
 export async function listOrderOptions(): Promise<{ id: string; siparisNo: string }[]> {
+  if (isDemoMode()) {
+    return MOCK_ORDERS.map((row) => ({ id: row.id, siparisNo: row.siparisNo }));
+  }
+
   const { data, error } = await supabase
     .from('siparisler')
     .select('id, siparis_no')
