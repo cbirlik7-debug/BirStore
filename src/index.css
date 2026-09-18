@@ -22,6 +22,12 @@
   --shadow:
     rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 
+  /* Mobil layout değişkenleri */
+  --mobile-header-h: 56px;
+  --bottom-nav-h: 60px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
   --sans:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
   --mono: ui-monospace, 'SF Mono', Consolas, monospace;
@@ -42,6 +48,8 @@
 
 body {
   margin: 0;
+  /* iOS bounce scroll'ü önle */
+  overscroll-behavior: none;
 }
 
 #root {
@@ -100,6 +108,10 @@ a[role='button'] {
   background: var(--bg-surface);
   color: var(--text-h);
   padding: 8px 14px;
+  /* Mobil: min dokunma hedefi 44px */
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background 0.15s,
     border-color 0.15s;
@@ -130,8 +142,11 @@ select {
   border: 1px solid var(--border);
   background: var(--bg-surface);
   color: var(--text-h);
-  padding: 8px 12px;
+  padding: 10px 12px;
   max-width: 100%;
+  /* Mobil: iOS zoom'u önle (16px altı font zoom yapar) */
+  font-size: max(16px, 1em);
+  min-height: 44px;
 }
 input:focus,
 select:focus {

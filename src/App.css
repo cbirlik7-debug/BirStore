@@ -5,12 +5,22 @@
   background: var(--bg);
 }
 
+/* ── Mobil: varsayılan olarak gizle ── */
+.mobile-header { display: none; }
+.bottom-nav    { display: none; }
+.mobile-drawer { display: none; }
+.sidebar-overlay { display: none; }
+
 .menu-toggle {
   display: none;
   margin-left: auto;
   padding: 6px 10px;
   font-size: 18px;
   line-height: 1;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  align-items: center;
 }
 
 .sidebar {
@@ -109,59 +119,389 @@
   padding: 32px 40px;
 }
 
+/* ═══════════════════════════════════════════
+   MOBİL LAYOUT  (≤ 768px)
+═══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .app-shell {
-    flex-direction: column;
-  }
 
+  /* ── Masaüstü sidebar: mobilde gizle ── */
   .sidebar {
-    width: 100%;
-    padding: 10px 16px;
-    gap: 0;
-  }
-
-  .sidebar-brand {
-    flex-shrink: 0;
-  }
-
-  .menu-toggle {
-    display: inline-flex;
-  }
-
-  .sidebar-nav,
-  .sidebar-footer {
     display: none;
   }
 
-  .sidebar.nav-open {
-    position: absolute;
+  /* ── App shell: dikey, full-height ── */
+  .app-shell {
+    flex-direction: column;
+    /* header + content + bottom-nav */
+    padding-top: calc(var(--mobile-header-h) + var(--safe-top));
+    padding-bottom: calc(var(--bottom-nav-h) + var(--safe-bottom));
+    min-height: 100svh;
+  }
+
+  /* ── Mobil üst header ── */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 50;
-    padding-bottom: 12px;
+    z-index: 60;
+    height: var(--mobile-header-h);
+    padding: 0 16px;
+    padding-top: var(--safe-top);
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .mobile-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .mobile-status-dot.online  { background: #3ecf8e; box-shadow: 0 0 6px #3ecf8e; }
+  .mobile-status-dot.offline { background: #e5484d; }
+  .mobile-status-dot.demo    { background: #f59e0b; }
+
+  .mobile-pending-badge {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .mobile-more-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-h);
+    font-size: 22px;
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 8px;
+  }
+
+  /* ── Daraltılmış arka plan overlay ── */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 69;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  /* ── Slide-down drawer menü ── */
+  .mobile-drawer {
+    display: block;
+    position: fixed;
+    top: calc(var(--mobile-header-h) + var(--safe-top));
+    left: 0;
+    right: 0;
+    z-index: 70;
+    max-height: calc(100svh - var(--mobile-header-h) - var(--bottom-nav-h) - var(--safe-top) - var(--safe-bottom));
+    overflow-y: auto;
+    animation: slideDown 0.22s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .mobile-drawer-inner {
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     box-shadow: var(--shadow);
   }
 
-  .sidebar.nav-open .sidebar-nav {
+  .mobile-drawer-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-drawer-config-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    min-height: 36px;
+  }
+
+  .mobile-drawer-nav {
     display: flex;
     flex-direction: column;
-    margin-top: 16px;
     gap: 2px;
   }
 
-  .sidebar.nav-open .sidebar-footer {
+  .mobile-drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    color: var(--text);
+    text-decoration: none;
+    min-height: 48px;
+    transition: background 0.12s;
+  }
+  .mobile-drawer-link:hover,
+  .mobile-drawer-link.active {
+    background: var(--accent-bg);
+    color: var(--text-h);
+  }
+  .mobile-drawer-link.active { font-weight: 600; }
+
+  .mobile-drawer-footer {
     display: flex;
     flex-direction: column;
-    margin-top: 12px;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
   }
 
-  .sidebar.nav-open .db-status {
-    display: inline-flex;
+  .mobile-signout-btn {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+    color: var(--danger);
+    width: 100%;
+    justify-content: center;
+    font-weight: 600;
   }
 
+  /* ── Bottom navigation bar ── */
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: calc(var(--bottom-nav-h) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: var(--sidebar-bg);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    min-height: var(--bottom-nav-h);
+    padding: 6px 4px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 10px;
+    border-radius: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s;
+  }
+  .bottom-nav-item.active {
+    color: var(--accent);
+  }
+  .bottom-nav-item:hover {
+    color: var(--text-h);
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .bottom-nav-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .bottom-nav-label {
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+  }
+
+  /* ── Ana içerik alanı ── */
   .app-main {
-    padding: 20px;
+    padding: 16px 14px;
+  }
+
+  /* ── Başlıklar mobilde küçült ── */
+  h1 { font-size: 22px; }
+  h2 { font-size: 17px; }
+
+  /* ── Tablolar: yatay kaydır ── */
+  .pending-list,
+  .results-table table,
+  .catalog-table {
+    font-size: 13px;
+  }
+  .pending-list th,
+  .pending-list td,
+  .results-table th,
+  .results-table td,
+  .catalog-table th,
+  .catalog-table td {
+    padding: 8px 10px;
+  }
+  /* Tablo içeren wrapper'a min-width ver */
+  .table-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Formlar: stack layout ── */
+  .catalog-form,
+  .definitions-form {
+    flex-direction: column;
+  }
+  .catalog-form label {
+    min-width: auto;
+    width: 100%;
+  }
+  .catalog-form input,
+  .catalog-form select,
+  .definitions-form input,
+  .definitions-form select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* ── Scanner input: tam genişlik ── */
+  .shelf-scan-step input,
+  .product-scan-step input,
+  .search-bar input {
+    max-width: 100%;
+  }
+  .box-scan-step select {
+    max-width: 100%;
+  }
+
+  /* ── Dashboard stat tile'lar ── */
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .stat-tile {
+    min-width: 0;
+    padding: 14px 12px;
+  }
+  .stat-tile strong {
+    font-size: 20px;
+  }
+
+  /* ── Login form ── */
+  .login-form {
+    margin: 20px auto;
+    max-width: 100%;
+    width: 100%;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 24px 20px;
+  }
+
+  /* ── Tutanak/order listesi: flex yerine block ── */
+  .tutanak-start {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .daily-report-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .goods-receiving-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .order-detail-actions {
+    gap: 8px;
+  }
+
+  /* ── Action buton grupları ── */
+  .sayim-lock-actions,
+  .sayim-count-actions,
+  .box-scan-actions,
+  .capture-panel-actions {
+    flex-wrap: wrap;
+  }
+
+  /* ── Fullscreen scanner: safe-area destekli ── */
+  .fullscreen-scanner-close {
+    top: calc(16px + var(--safe-top));
+    right: 16px;
+  }
+
+  /* ── Active banner'lar: mobil uygun ── */
+  .active-shelf-banner,
+  .active-box-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .active-shelf-banner button,
+  .active-box-info { margin-left: 0; }
+
+  /* ── Reports tab'lar ── */
+  .reports-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  /* ── Identifier slot list: tam genişlik ── */
+  .identifier-slot {
+    padding: 12px;
+  }
+
+  /* ── Capture panel: fullscreen gibi ── */
+  .camera-scanner-panel {
+    border-radius: 12px 12px 0 0;
+    max-width: 100%;
   }
 }
 
