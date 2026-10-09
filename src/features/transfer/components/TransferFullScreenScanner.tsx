@@ -26,27 +26,39 @@ export function TransferFullScreenScanner({
   onClose: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { start, stop, error } = useCameraScanner(videoRef);
+  const { start, stop, error, hasTorch, isTorchOn, toggleTorch } = useCameraScanner(videoRef);
 
   useEffect(() => {
-    start(onScan, { continuous: true });
+    start(onScan, { continuous: true, cooldownMs: 1200 });
     return () => stop();
-  }, []);
+  }, [onScan, start, stop]);
 
   return (
     <div className="fullscreen-scanner">
       <video ref={videoRef} className="fullscreen-scanner-video" muted playsInline />
-      <button
-        type="button"
-        className="fullscreen-scanner-close"
-        aria-label="Kamerayı kapat"
-        onClick={() => {
-          stop();
-          onClose();
-        }}
-      >
-        ✕
-      </button>
+      <div className="fullscreen-scanner-controls">
+        {hasTorch && (
+          <button
+            type="button"
+            className={`fullscreen-scanner-btn ${isTorchOn ? 'active' : ''}`}
+            aria-label={isTorchOn ? 'Feneri Kapat' : 'Feneri Aç'}
+            onClick={() => toggleTorch()}
+          >
+            {isTorchOn ? '🔦' : '💡'}
+          </button>
+        )}
+        <button
+          type="button"
+          className="fullscreen-scanner-close"
+          aria-label="Kamerayı kapat"
+          onClick={() => {
+            stop();
+            onClose();
+          }}
+        >
+          ✕
+        </button>
+      </div>
       {error && (
         <p role="alert" className="fullscreen-scanner-error">
           {error}

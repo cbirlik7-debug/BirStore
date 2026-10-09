@@ -7,6 +7,7 @@ import { isSupabaseConfigured, isDemoMode } from '../shared/supabase/client';
 import { SupabaseConfigModal } from '../shared/supabase/SupabaseConfigModal';
 import { getModulesForRole } from '../shared/permissions/moduleRegistry';
 import type { Role } from '../shared/permissions/types';
+import { usePwaInstall } from '../shared/lib/usePwaInstall';
 
 const ROLE_LABELS: Record<Role, string> = {
   yonetici: 'Yönetici Paneli',
@@ -20,6 +21,7 @@ export function AppShell() {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const location = useLocation();
   const { pending, online } = useOfflineQueueStatus();
+  const { canInstall, install } = usePwaInstall();
 
   useEffect(() => {
     setNavOpen(false);
@@ -55,6 +57,25 @@ export function AppShell() {
             <span className="db-status">
               {demoActive ? '🟡 Demo Modu' : online ? '🟢 Çevrimiçi ✓' : '🔴 Çevrimdışı'}
             </span>
+            {canInstall && (
+              <button
+                type="button"
+                onClick={install}
+                style={{
+                  background: 'var(--gradient-accent)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 10px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}
+              >
+                📲 Uygulamayı Yükle
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setIsConfigOpen(true)}
@@ -126,6 +147,28 @@ export function AppShell() {
                 ⚙️ {isSupabaseConfigured ? 'Supabase Ayarları' : 'Supabase Bağla'}
               </button>
             </div>
+
+            {canInstall && (
+              <div style={{ padding: '4px 0' }}>
+                <button
+                  type="button"
+                  onClick={() => { install(); setNavOpen(false); }}
+                  style={{
+                    width: '100%',
+                    background: 'var(--gradient-accent)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '9px 12px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                  }}
+                >
+                  📲 Uygulamayı Telefona Yükle
+                </button>
+              </div>
+            )}
+
             <nav className="mobile-drawer-nav">
               {modules.map((m) => (
                 <NavLink
