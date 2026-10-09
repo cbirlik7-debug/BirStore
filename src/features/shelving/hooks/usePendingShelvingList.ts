@@ -3,6 +3,11 @@ import type { PendingItem } from '../types';
 
 type Action =
   | { type: 'ADD_OR_INCREMENT'; item: { productId: string; ean: string; articleNo: string; name: string } }
+  | {
+      type: 'ADD_WITH_QTY';
+      item: { productId: string; ean: string; articleNo: string; name: string };
+      quantity: number;
+    }
   | { type: 'SET_QTY'; productId: string; quantity: number }
   | { type: 'REMOVE'; productId: string }
   | { type: 'CLEAR' };
@@ -17,6 +22,18 @@ function reducer(state: PendingItem[], action: Action): PendingItem[] {
         );
       }
       return [...state, { ...action.item, quantity: 1 }];
+    }
+    case 'ADD_WITH_QTY': {
+      const existing = state.find((i) => i.productId === action.item.productId);
+      const addQty = Math.max(1, action.quantity);
+      if (existing) {
+        return state.map((i) =>
+          i.productId === action.item.productId
+            ? { ...i, quantity: i.quantity + addQty }
+            : i,
+        );
+      }
+      return [...state, { ...action.item, quantity: addQty }];
     }
     case 'SET_QTY':
       return state.map((i) =>
@@ -38,6 +55,10 @@ export function usePendingShelvingList() {
     items,
     addOrIncrement: (item: { productId: string; ean: string; articleNo: string; name: string }) =>
       dispatch({ type: 'ADD_OR_INCREMENT', item }),
+    addWithQuantity: (
+      item: { productId: string; ean: string; articleNo: string; name: string },
+      quantity: number,
+    ) => dispatch({ type: 'ADD_WITH_QTY', item, quantity }),
     setQuantity: (productId: string, quantity: number) =>
       dispatch({ type: 'SET_QTY', productId, quantity }),
     remove: (productId: string) => dispatch({ type: 'REMOVE', productId }),
