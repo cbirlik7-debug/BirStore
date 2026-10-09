@@ -4,6 +4,8 @@ export interface PendingItem {
   articleNo: string;
   name: string;
   quantity: number;
+  /** Eklenebilecek maksimum miktar (bekleyen stok). Tanımlıysa aşılamaz. */
+  maxQuantity?: number;
 }
 
 export interface ActiveShelf {

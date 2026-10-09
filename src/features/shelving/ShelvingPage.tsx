@@ -527,7 +527,7 @@ function ShelvingFlow({ activeShelf, waitingProducts, loadingWaiting, onChangeSh
         <WaitingProductsPicker
           items={waitingProducts}
           loading={loadingWaiting}
-          onAddProduct={(p) => addWithQuantity(p, p.quantity)}
+          onAddProduct={(p) => addWithQuantity(p, p.quantity, p.quantity)}
         />
       )}
 
