@@ -7,6 +7,7 @@ import { ClosedBoxList } from './components/ClosedBoxList';
 import { ScannerInput } from '../../shared/scanner/ScannerInput';
 import { useProductCapture } from './hooks/useProductCapture';
 import { closeBox, reopenBox } from './api/goodsReceiving.api';
+import { PendingOrdersSection } from './components/PendingOrdersSection';
 import type { ActiveBox } from './types';
 
 const FullScreenProductScanner = lazy(() =>
@@ -120,7 +121,10 @@ export function GoodsReceivingPage() {
           onChangeBox={() => setActiveBox(null)}
         />
       ) : (
-        <BoxScanStep onBoxReady={setActiveBox} />
+        <>
+          <BoxScanStep onBoxReady={setActiveBox} />
+          <PendingOrdersSection onSelectBox={setActiveBox} />
+        </>
       )}
     </div>
   );

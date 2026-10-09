@@ -1,6 +1,7 @@
 import { supabase, isDemoMode } from '../../../shared/supabase/client';
 import { runOrQueue, registerOfflineHandler } from '../../../shared/offline/offlineQueue';
 import { getMockProducts, MOCK_ORDERS } from '../../../shared/mock/mockData';
+import { listOrders } from '../../orders/api/orders.api';
 import type { IdentifierValues, RequiredId } from '../../../shared/supabase/types';
 import type { ActiveBox, CommittedUnit, DuplicateMatch, EntryProduct } from '../types';
 
@@ -345,3 +346,93 @@ export async function listOrderOptions(): Promise<{ id: string; siparisNo: strin
   if (error) throw new Error(error.message);
   return (data ?? []).map((row) => ({ id: row.id, siparisNo: row.siparis_no }));
 }
+
+export async function listBoxesByOrderId(orderId: string): Promise<ActiveBox[]> {
+  if (isDemoMode()) {
+    const isOrd1 = orderId === 'ord-1';
+    return [
+      {
+        id: `box-${orderId}-1`,
+        barkod: isOrd1 ? 'KL-849201948' : `KL-${orderId.slice(-4)}-01`,
+        tip: 'eirsaliye',
+        durum: 'acik',
+        siparisId: orderId,
+        siparisNo: isOrd1 ? 'SIP-2026-0811' : 'SIP-2026-0813',
+        magazaKodu: 'IST-01',
+        magazaAdi: 'MediaMarkt Meydan İstanbul',
+        uyari: null,
+        reopenLog: [],
+      },
+      {
+        id: `box-${orderId}-2`,
+        barkod: isOrd1 ? 'KL-849201949' : `KL-${orderId.slice(-4)}-02`,
+        tip: 'eirsaliye',
+        durum: 'kapali',
+        siparisId: orderId,
+        siparisNo: isOrd1 ? 'SIP-2026-0811' : 'SIP-2026-0813',
+        magazaKodu: 'IST-01',
+        magazaAdi: 'MediaMarkt Meydan İstanbul',
+        uyari: null,
+        reopenLog: [],
+      },
+    ];
+  }
+
+  const { data, error } = await supabase
+    .from('koliler')
+    .select(BOX_SELECT)
+    .eq('siparis_id', orderId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((row) => mapBoxRow(row as unknown as KolilerRow));
+}
+
+async function getCompletedOrderIds(): Promise<Set<string>> {
+  if (isDemoMode()) {
+    return new Set(['ord-2']);
+  }
+  const { data, error } = await supabase.from('tamamlanan_siparisler').select('siparis_id');
+  if (error) throw new Error(error.message);
+  return new Set((data ?? []).map((r) => r.siparis_id));
+}
+
+export interface PendingOrderSummary {
+  id: string;
+  siparisNo: string;
+  tedarikciAdi: string | null;
+  irsaliyeNo: string | null;
+  createdAt: string;
+  beklenenToplam: number;
+  girilenToplam: number;
+}
+
+export async function listPendingOrders(): Promise<PendingOrderSummary[]> {
+  const [orders, completedIds] = await Promise.all([
+    listOrders(),
+    getCompletedOrderIds(),
+  ]);
+
+  const pending = orders.filter((o) => !completedIds.has(o.id));
+
+  return Promise.all(
+    pending.map(async (order) => {
+      const counts = await countUnitsByProductForOrder(order.id);
+      const girilenToplam = order.items.reduce(
+        (sum, item) => sum + (counts[item.productId] ?? 0),
+        0,
+      );
+      const beklenenToplam = order.items.reduce((sum, item) => sum + item.beklenen, 0);
+      return {
+        id: order.id,
+        siparisNo: order.siparisNo,
+        tedarikciAdi: order.tedarikciAdi,
+        irsaliyeNo: order.irsaliyeNo,
+        createdAt: order.createdAt,
+        beklenenToplam,
+        girilenToplam,
+      };
+    }),
+  );
+}
+
